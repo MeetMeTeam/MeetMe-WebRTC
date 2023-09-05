@@ -14,14 +14,14 @@ let io = null
 const addNewConnectedUser = ({ socketId, userId}) => {
     connectedUsers.set(socketId , {userId})
     console.log('new connect users')
-    console.log(connectedUsers)
+    // console.log(connectedUsers)
 }
 
 const removeConnectedUser = (socketId)=>{
     if(connectedUsers.has(socketId)){
         connectedUsers.delete(socketId);
         console.log('users disconnect')
-        console.log(connectedUsers)
+        // console.log(connectedUsers)
 
     }
 }

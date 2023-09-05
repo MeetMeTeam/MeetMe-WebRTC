@@ -5,7 +5,7 @@ const friendsUpdates = require('../../socketHandlers/updates/friends')
 const postInvite = async (req, res) => {
     const { targetMailAddress } = req.body;
     const { userId , mail } = req.user;
-    console.log(req.user)
+    // console.log(req.user)
     // check if friend that we would like to invite is not user
 
     if (mail.toLowerCase() === targetMailAddress.toLowerCase()){
