@@ -20,7 +20,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/friend-invitation', friendInvitationRoutes)
 
 app.get('/', (req, res) => {
-	res.send('Running');
+	res.send('Running leaw');
 });
 
 const server = http.createServer(app);
