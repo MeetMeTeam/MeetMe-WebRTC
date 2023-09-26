@@ -1,6 +1,7 @@
 const User = require("../../models/user");
 const FriendInvitation = require("../../models/friendInvitation");
 const serverStore = require("../../serverStore");
+const roomsUpdate = require("./rooms");
 
 
 const updateFriendsPendingInvitations = async (userId) => {
@@ -25,7 +26,7 @@ const updateFriendsPendingInvitations = async (userId) => {
     }
   };
 
-  const updateFriends = async (userId) => {
+  const updateFriends = async (userId,socketId) => {
     try {
       // find active connections of specific id (online users)
       const receiverList = serverStore.getActiveConnections(userId);
@@ -53,6 +54,8 @@ const updateFriendsPendingInvitations = async (userId) => {
               friends: friendsList ? friendsList : [],
             });
           });
+          roomsUpdate.updateRooms(socketId);
+
         }
       }
     } catch (err) {
