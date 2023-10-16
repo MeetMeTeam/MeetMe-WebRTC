@@ -48,8 +48,8 @@ const registerSocketServer = (server) => {
         directChatHistoryHandler(socket, data);
       });
 
-      socket.on("room-create", () => {
-        roomCreateHandler(socket);
+      socket.on("room-create", (data) => {
+        roomCreateHandler(socket,data);
       });
 
     socket.on("room-join", (data) => {
@@ -67,6 +67,11 @@ const registerSocketServer = (server) => {
     socket.on("conn-signal", (data) => {
       roomSignalingDataHandler(socket, data);
     });
+
+    socket.on('chatter', (message) => {
+      console.log('chatter : ', message)
+      io.emit('chatter', message)
+    })
 
 
     socket.on("disconnect", () => {

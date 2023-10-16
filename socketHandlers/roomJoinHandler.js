@@ -2,11 +2,12 @@ const serverStore = require("../serverStore");
 const roomsUpdates = require("./updates/rooms");
 
 const roomJoinHandler = (socket, data) => {
-  const { roomId } = data;
+  const { roomId , pic } = data;
 
   const participantDetails = {
     userId: socket.user.userId,
     socketId: socket.id,
+    pic : pic
   };
 
   const roomDetails = serverStore.getActiveRoom(roomId);

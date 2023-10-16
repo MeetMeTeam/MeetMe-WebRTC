@@ -53,16 +53,18 @@ const getActiveConnections = (userId) => {
 
   //room
 
-  const addNewActiveRoom = (userId, socketId) => {
+  const addNewActiveRoom = (userId, socketId , data) => {
     const newActiveRoom = {
       roomCreator: {
         userId,
         socketId,
+        roomName : data
       },
       participants: [
         {
           userId,
           socketId,
+          pic:data.pic
         },
       ],
       roomId: uuidv4(),
