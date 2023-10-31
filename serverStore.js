@@ -58,13 +58,15 @@ const getActiveConnections = (userId) => {
       roomCreator: {
         userId,
         socketId,
-        roomName : data
+        roomName : data.name,
+        type  : data.type
       },
       participants: [
         {
           userId,
           socketId,
-          pic:data.pic
+          name:data.name ,
+          
         },
       ],
       roomId: uuidv4(),

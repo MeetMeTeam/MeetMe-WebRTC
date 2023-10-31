@@ -69,9 +69,20 @@ const registerSocketServer = (server) => {
     });
 
     socket.on('chatter', (message) => {
-      console.log('chatter : ', message)
       io.emit('chatter', message)
     })
+
+    socket.on('cam-change', (data) => {
+      data.peopleInRoom.forEach((participant) => { 
+        socket.to(participant.socketId).emit("other-cam-change", {
+         userId : data.userId,
+         isCameraEnabled : data.isCameraEnabled,
+        });
+      }
+      )
+      // io.emit('chatter', message)
+    })
+
 
 
     socket.on("disconnect", () => {
