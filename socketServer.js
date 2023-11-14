@@ -78,6 +78,7 @@ const registerSocketServer = (server) => {
         socket.to(participant.socketId).emit("other-cam-change", {
          userId : data.userId,
          isCameraEnabled : data.isCameraEnabled,
+         image : data.image
         });
       }
       )

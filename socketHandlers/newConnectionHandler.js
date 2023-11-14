@@ -16,7 +16,7 @@ const newConnectionHandler = async (socket, io) => {
   friendsUpdate.updateFriends(userDetails.userId,socket.id);
 
   setTimeout(() => {
-    // roomsUpdate.updateRooms(socket.id);
+    roomsUpdate.updateRooms(socket.id);
   }, [1000]);
 };
 
