@@ -5,6 +5,7 @@ const directMessageHandler = require("./socketHandlers/directMessageHandler");
 const directChatHistoryHandler = require("./socketHandlers/directChatHistoryHandler");
 const roomCreateHandler = require("./socketHandlers/roomCreateHandler");
 const roomJoinHandler = require("./socketHandlers/roomJoinHandler");
+const friendInviteHandler = require("./socketHandlers/friendInviteHandler");
 const roomLeaveHandler = require("./socketHandlers/roomLeaveHandler");
 const roomInitializeConnectionHandler = require("./socketHandlers/roomInitializeConnectionHandler");
 const roomSignalingDataHandler = require("./socketHandlers/roomSignalingDataHandler");
@@ -83,6 +84,14 @@ const registerSocketServer = (server) => {
       // io.emit('chatter', message)
     })
 
+    socket.on('sendFriendInvite', (data) => {
+      // socket.to(participant.socketId).emit("other-cam-change", {
+      //   userId : data.userId,
+      //   isCameraEnabled : data.isCameraEnabled,
+      //  });
+      console.log("1")
+      friendInviteHandler(socket,data)  
+    })
 
 
     socket.on("disconnect", () => {
