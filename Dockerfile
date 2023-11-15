@@ -1,20 +1,15 @@
-# ใช้ Node.js 14 ในการสร้าง base image
-FROM node:14
+# base image
+FROM node:alpine3.11
 
-# ตั้งค่าไดเร็กทอรีที่จะให้ทำงาน
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json และ package-lock.json ไปยังไดเร็กทอรีทำงาน
-COPY package*.json ./
-
-# ติดตั้ง dependencies
-RUN npm install
-
-# Copy โค้ดทั้งหมดไปยังไดเร็กทอรีทำงาน
 COPY . .
 
-# ให้ Express.js ทำงานที่ port 5002
-EXPOSE 5002
+# add `/usr/src/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
-# คำสั่งสำหรับเริ่มต้น Express.js ด้วย nodemon
+RUN npm install
+
+
+# start app
 CMD ["npm", "start"]
