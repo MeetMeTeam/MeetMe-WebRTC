@@ -14,6 +14,7 @@ const serverStore = require("./serverStore");
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
+    path: "/socket/",
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
@@ -69,8 +70,16 @@ const registerSocketServer = (server) => {
       roomSignalingDataHandler(socket, data);
     });
 
-    socket.on('chatter', (message) => {
-      io.emit('chatter', message)
+    socket.on('chatter', (data) => {
+      if(data.people){
+        io.to(socket.id).emit("chatter",data.message );
+        data.people.forEach((participant) => { 
+          io.to(participant.connUserSocketId).emit("chatter",data.message );
+        }
+        )
+      }else{
+        io.emit('chatter', data.message)
+      }
     })
 
     socket.on('cam-change', (data) => {
@@ -78,7 +87,8 @@ const registerSocketServer = (server) => {
         socket.to(participant.socketId).emit("other-cam-change", {
          userId : data.userId,
          isCameraEnabled : data.isCameraEnabled,
-         image : data.image
+         image : data.image,
+         socketId : socket.id
         });
       }
       )
@@ -86,14 +96,20 @@ const registerSocketServer = (server) => {
     })
 
     socket.on('sendFriendInvite', (data) => {
-      // socket.to(participant.socketId).emit("other-cam-change", {
-      //   userId : data.userId,
-      //   isCameraEnabled : data.isCameraEnabled,
-      //  });
-      console.log("1")
       friendInviteHandler(socket,data)  
     })
 
+    socket.on('invite-room', (data) => {
+      const onlineUsers = serverStore.getOnlineUsers()
+      for (let index = 0; index < onlineUsers.length; index++) {
+        if(onlineUsers[index].userId === data.id ) {
+          console.log("1")
+          io.to(onlineUsers[index].socketId).emit("invite-room",data );
+        }
+        
+      }
+     
+    })
 
     socket.on("disconnect", () => {
       disconnectHandler(socket);
