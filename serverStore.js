@@ -75,7 +75,7 @@ const getActiveConnections = (userId) => {
     activeRooms = [...activeRooms, newActiveRoom];
   
     console.log("new active rooms: ");
-    console.log(activeRooms);
+    // console.log(activeRooms);
   
     return newActiveRoom;
   };
@@ -98,19 +98,30 @@ const getActiveConnections = (userId) => {
     }
   };
 
+  const checkRoom = (roomId) => {
+   check = activeRooms.find((room) => room.roomId === roomId)
+if(check) {
+  return true
+}else
+ return  false ;
+  };
+
   const joinActiveRoom = (roomId, newParticipant) => {
     const room = activeRooms.find((room) => room.roomId === roomId);
     console.log("room has been found");
-  
     activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
-    console.log(activeRooms);
-  
-    const updatedRoom = {
+
+  if(room){
+      const updatedRoom = {
       ...room,
       participants: [...room.participants, newParticipant],
     };
   
     activeRooms.push(updatedRoom);
+  }
+  
+  
+    
     console.log(activeRooms)
   };
 
@@ -133,6 +144,7 @@ const getActiveConnections = (userId) => {
   };
 
 module.exports = {
+  checkRoom,
     getOnlineUsers,
     addNewConnectedUser,
     removeConnectedUser,

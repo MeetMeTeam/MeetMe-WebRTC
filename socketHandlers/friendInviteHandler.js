@@ -5,8 +5,6 @@ const friendInviteHandler = (socket,data) => {
   console.log("2")
 
   const onlineUsers = serverStore.getOnlineUsers()
-  console.log(onlineUsers)
-  console.log(data)
   for (let index = 0; index < onlineUsers.length; index++) {
     
     if(onlineUsers[index].userId === data ) {
