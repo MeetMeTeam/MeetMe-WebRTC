@@ -14,6 +14,7 @@ const serverStore = require("./serverStore");
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
+    path: "/socket/",
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
@@ -24,7 +25,6 @@ const registerSocketServer = (server) => {
 
   //เมื่อคอนเน็ก จะไปวาลิเดท โทเค้นก่อน
   io.use((socket, next) => {
-    // console.log(socket.user)
     authSocket(socket, next);
   });
 
@@ -98,7 +98,6 @@ const registerSocketServer = (server) => {
 
     socket.on("invite-room", (data) => {
       const onlineUsers = serverStore.getOnlineUsers();
-      console.log(onlineUsers);
       for (let index = 0; index < onlineUsers.length; index++) {
         if (onlineUsers[index].userId === data.id) {
           console.log("1");
