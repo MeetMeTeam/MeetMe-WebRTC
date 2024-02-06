@@ -14,7 +14,7 @@ const serverStore = require("./serverStore");
 
 const registerSocketServer = (server) => {
   const io = require("socket.io")(server, {
-    path: "/socket",
+    path: "/socket/",
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
