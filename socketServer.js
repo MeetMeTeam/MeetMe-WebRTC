@@ -23,9 +23,9 @@ const registerSocketServer = (server) => {
   serverStore.setSocketServerInstance(io);
 
   //เมื่อคอนเน็ก จะไปวาลิเดท โทเค้นก่อน
-  io.use((socket, next) => {
-    authSocket(socket, next);
-  });
+  // io.use((socket, next) => {
+  //   authSocket(socket, next);
+  // });
 
   const emitOnlineUsers = () => {
     const onlineUsers = serverStore.getOnlineUsers();
@@ -69,10 +69,12 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("chatter", (data) => {
-      if (data.people) {
+      console.log("chatter", data);
+      if (data.message.people) {
+        console.log("test");
         io.to(socket.id).emit("chatter", data.message);
-        data.people.forEach((participant) => {
-          io.to(participant.connUserSocketId).emit("chatter", data.message);
+        data.message.people.forEach((participant) => {
+          io.to(participant.socketId).emit("chatter", data.message);
         });
       } else {
         io.emit("chatter", data.message);
