@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const connectedUsers = new Map();
 let activeRooms = [];
+let passwordActiveRooms = [];
 
 let io = null;
 
@@ -47,12 +48,14 @@ const getOnlineUsers = () => {
 
 //room
 const addNewActiveRoom = (userId, socketId, data) => {
+  const roomId = uuidv4();
   const newActiveRoom = {
     roomCreator: {
       userId,
       socketId,
       roomName: data.name,
       type: data.type,
+      detail: data.detail,
     },
     participants: [
       {
@@ -61,21 +64,90 @@ const addNewActiveRoom = (userId, socketId, data) => {
         name: data.name,
       },
     ],
-    roomId: uuidv4(),
+    roomId: roomId,
   };
-
+  const privateData = {
+    password: data.password,
+    roomId: roomId,
+  };
   activeRooms = [...activeRooms, newActiveRoom];
+  passwordActiveRooms = [...passwordActiveRooms, privateData];
 
   console.log("new active rooms: ");
 
   return newActiveRoom;
 };
-addNewActiveRoom("", "", { name: "ห้องนั่งเล่น🛋️", type: "VOICE" });
+const data = {
+  detail: {
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+};
+addNewActiveRoom("", "", {
+  name: "ห้องนั่งเล่น🛋️",
+  type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "🧑🏻‍💻 General",
+        color: "bg-yellow-70",
+      },
+      {
+        id: 1,
+        name: "🤪 Fun ",
+        color: "bg-yellow-40",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
+});
 addNewActiveRoom("", "", {
   name: "ชั้นด่านฟ้าท้าทดลอง๋࣭ ⭑☁.๋࣭ ⭑",
   type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "⚽ Hobbies",
+        color: "bg-blue-80",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
 });
-addNewActiveRoom("", "", { name: "ห้องทานข้าว🥘", type: "VOICE" });
+addNewActiveRoom("", "", {
+  name: "ห้องทานข้าว🥘",
+  type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "🧑🏻‍💻 General",
+        color: "bg-yellow-70",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
+});
 
 const getActiveRooms = () => {
   return [...activeRooms];
