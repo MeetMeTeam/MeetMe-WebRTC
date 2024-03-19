@@ -9,12 +9,6 @@ const newConnectionHandler = async (socket, io) => {
     userId: socket.handshake.auth?.userId,
   });
 
-  // update pending friends invitations list
-  friendsUpdate.updateFriendsPendingInvitations(userDetails.userId);
-
-  // update friends list
-  friendsUpdate.updateFriends(userDetails.userId,socket.id);
-
   setTimeout(() => {
     roomsUpdate.updateRooms(socket.id);
   }, [1000]);
