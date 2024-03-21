@@ -3,7 +3,7 @@ version: "3.9"
 services:
   socket:
     container_name: socket-docker
-    build: .././MeetMe-Websocket/ 
+    build: .
     volumes:
       - '.././MeetMe-Websocket/:/usr/src/app'
     networks:  
