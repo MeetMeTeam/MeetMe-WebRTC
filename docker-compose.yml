@@ -2,8 +2,8 @@ version: "3.9"
 
 services:
   socket:
+    image: winnerkypt/meetme-socket:latest
     container_name: socket-docker
-    build: .
     volumes:
       - '.././MeetMe-Websocket/:/usr/src/app'
     networks:  
