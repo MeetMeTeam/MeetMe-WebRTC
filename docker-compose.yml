@@ -9,9 +9,9 @@ services:
     networks:  
       - meetme
     environment:
-      API_PORT: 5002
-      MONGO_URL: mongodb+srv://MeetMeUser:Ntw171044.@cluster0.salidj6.mongodb.net/?retryWrites=true&w=majority
-      TOKEN_KEY: "H3LloM3ETm33wINneR003Nut069bEWo72"
+      API_PORT: ${API_PORT}
+      MONGO_URL: ${MONGO_URL}
+      TOKEN_KEY: ${TOKEN_KEY}
 networks:
   meetme:  
     external: true

@@ -37,7 +37,7 @@ jobs:
           context: .
           file: Dockerfile
           push: true
-          tags: winnerkypt/meetme-socket:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/meetme-socket:latest
   deploy:
     runs-on:
       - self-hosted
@@ -52,7 +52,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd MeetMe-Websocket/
-            docker pull winnerkypt/meetme-socket:latest
+            docker pull ${{ secrets.DOCKER_USERNAME }}/meetme-socket:latest
             docker rm -f socket-docker
             docker compose -f docker-compose.yml up -d
             echo finish
