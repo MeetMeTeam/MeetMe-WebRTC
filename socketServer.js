@@ -69,7 +69,7 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("chatter", (data) => {
-      console.log("chatter", data);
+      console.log("chatter", data.name);
       if (data.message.people) {
         console.log("test");
         io.to(socket.id).emit("chatter", data.message);
