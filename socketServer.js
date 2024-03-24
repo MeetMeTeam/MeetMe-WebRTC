@@ -107,6 +107,28 @@ const registerSocketServer = (server) => {
       }
     });
 
+    socket.on("send-gift-to-other", (data) => {
+      console.log(data);
+      io.to(socket.id).emit("other-send-gift", data);
+      for (let index = 0; index < data.otherPeople.length; index++) {
+        io.to(data.otherPeople[index].connUserSocketId).emit(
+          "other-send-gift",
+          data
+        );
+      }
+      const message = {
+        color: "black",
+        name: "system",
+        text: `คุณ ${data.userDetail.displayName} ได้ส่งของขวัญให้กับ ${data.selectUser.name.displayName}`,
+        textId: data.idText,
+        isGift: true,
+      };
+      io.to(socket.id).emit("chatter", message);
+      data.otherPeople.forEach((participant) => {
+        io.to(participant.connUserSocketId).emit("chatter", message);
+      });
+    });
+
     socket.on("notify-join", (data) => {
       io.to(socket.id).emit("notify-join", serverStore.checkRoom(data));
     });
