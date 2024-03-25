@@ -129,6 +129,17 @@ const registerSocketServer = (server) => {
       });
     });
 
+    socket.on("send-card-talk", (data) => {
+      console.log(data);
+      io.to(socket.id).emit("other-send-card-talk", data);
+      for (let index = 0; index < data.otherPeople.length; index++) {
+        io.to(data.otherPeople[index].connUserSocketId).emit(
+          "other-send-card-talk",
+          data
+        );
+      }
+    });
+
     socket.on("notify-join", (data) => {
       io.to(socket.id).emit("notify-join", serverStore.checkRoom(data));
     });
