@@ -48,7 +48,6 @@ const getOnlineUsers = () => {
 };
 
 setInterval(() => {
-  getOnlineUsers();
   removeInvalidParticipants();
 }, [3000]);
 
@@ -56,13 +55,29 @@ function removeInvalidParticipants() {
   activeRooms.forEach((room) => {
     const validParticipants = [];
     room.participants.forEach((participant) => {
-      if (
-        participant.socketId === "default" ||
-        connectedUsers.has(participant.socketId)
-      ) {
+      console.log("------------------");
+      console.log(participant);
+      console.log("------------------");
+      const connectedUsersId = [];
+      connectedUsers.forEach((value, key) => {
+        connectedUsersId.push(value.userId);
+      });
+
+      let check = false;
+      if (participant.userId === "default") {
+        check = true;
+      } else {
+        check = connectedUsersId.some(
+          (userId) => userId === participant.userId
+        );
+      }
+
+      console.log(check);
+      if (check) {
         validParticipants.push(participant);
       }
     });
+
     room.participants = validParticipants;
   });
 }
