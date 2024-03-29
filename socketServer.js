@@ -29,6 +29,9 @@ const registerSocketServer = (server) => {
 
   const emitOnlineUsers = () => {
     const onlineUsers = serverStore.getOnlineUsers();
+    console.log(onlineUsers);
+    console.log("---------------------------");
+
     io.emit("online-users", { onlineUsers });
   };
 
@@ -69,6 +72,8 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("chatter", (data) => {
+      console.log("chatter", data);
+
       console.log("chatter", data.name);
       if (data.message.people) {
         console.log("test");

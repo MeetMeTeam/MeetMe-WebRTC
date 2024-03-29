@@ -43,8 +43,29 @@ const getOnlineUsers = () => {
     onlineUsers.push({ socketId: key, userId: value.userId });
   });
 
+  connectedUsers.forEach((value, key) => {});
   return onlineUsers;
 };
+
+setInterval(() => {
+  getOnlineUsers();
+  removeInvalidParticipants();
+}, [3000]);
+
+function removeInvalidParticipants() {
+  activeRooms.forEach((room) => {
+    const validParticipants = [];
+    room.participants.forEach((participant) => {
+      if (
+        participant.socketId === "default" ||
+        connectedUsers.has(participant.socketId)
+      ) {
+        validParticipants.push(participant);
+      }
+    });
+    room.participants = validParticipants;
+  });
+}
 
 //room
 const addNewActiveRoom = (userId, socketId, data) => {
@@ -86,7 +107,7 @@ const data = {
     },
   },
 };
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ห้องนั่งเล่น🛋️",
   type: "VOICE",
   detail: {
@@ -110,7 +131,7 @@ addNewActiveRoom("", "", {
   },
   password: "123456",
 });
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ชั้นด่านฟ้าท้าทดลอง๋࣭ ⭑☁.๋࣭ ⭑",
   type: "VOICE",
   detail: {
@@ -129,7 +150,7 @@ addNewActiveRoom("", "", {
   },
   password: "123456",
 });
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ห้องทานข้าว🥘",
   type: "VOICE",
   detail: {
