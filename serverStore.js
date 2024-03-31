@@ -14,6 +14,29 @@ const getSocketServerInstance = () => {
   return io;
 };
 
+const removeUserFromRoom = (data) => {
+  console.log(data);
+  const newActiveRoom = activeRooms;
+  newActiveRoom.forEach((room) => {
+    const Participants = [];
+    room.participants.forEach((participant) => {
+      let check = false;
+      if (participant.userId === "default") {
+        check = false;
+      }
+      if (participant.userId === data.userId) {
+      }
+      if (participant.userId !== data.userId) {
+        Participants.push(participant);
+      }
+    });
+
+    room.participants = Participants;
+  });
+
+  console.log(newActiveRoom);
+};
+
 const addNewConnectedUser = ({ socketId, userId }) => {
   connectedUsers.set(socketId, { userId });
 };
@@ -69,7 +92,6 @@ function removeInvalidParticipants() {
         );
       }
 
-      console.log(check);
       if (check) {
         validParticipants.push(participant);
       }
@@ -209,7 +231,6 @@ const checkRoom = (roomId) => {
 
 const joinActiveRoom = (roomId, newParticipant) => {
   const room = activeRooms.find((room) => room.roomId === roomId);
-  console.log("room has been found");
   activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
 
   if (room) {
@@ -220,8 +241,6 @@ const joinActiveRoom = (roomId, newParticipant) => {
 
     activeRooms.push(updatedRoom);
   }
-
-  console.log(activeRooms);
 };
 
 const leaveActiveRoom = (roomId, participantSocketId) => {
@@ -255,4 +274,5 @@ module.exports = {
   getActiveRoom,
   joinActiveRoom,
   leaveActiveRoom,
+  removeUserFromRoom,
 };

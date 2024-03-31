@@ -23,4 +23,30 @@ const newConnectionHandler = async (socket, io) => {
   }, 1000);
 };
 
-module.exports = newConnectionHandler;
+const checkUserInRoom = async (socket, io, data) => {
+  const userId = socket.handshake.auth?.userId;
+  if (data.isUserInRoom === false) {
+    const activeRooms = serverStore.getActiveRooms();
+
+    activeRooms.forEach((room) => {
+      const validParticipants = [];
+      room.participants.forEach((participant) => {
+        let check = false;
+        if (participant.userId === "default") {
+          check = false;
+        }
+        if (participant.userId === userId) {
+          serverStore.removeUserFromRoom({
+            roomId: room.roomId,
+            userId: userId,
+          });
+        }
+      });
+
+      // room.participants = validParticipants;
+    });
+  }
+  roomsUpdate.updateRooms(socket.id);
+};
+
+module.exports = { newConnectionHandler, checkUserInRoom };

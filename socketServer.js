@@ -1,5 +1,6 @@
 const authSocket = require("./middleware/authSocket");
 const newConnectionHandler = require("./socketHandlers/newConnectionHandler");
+
 const disconnectHandler = require("./socketHandlers/disconnectHandler");
 const directMessageHandler = require("./socketHandlers/directMessageHandler");
 const directChatHistoryHandler = require("./socketHandlers/directChatHistoryHandler");
@@ -37,7 +38,7 @@ const registerSocketServer = (server) => {
   io.on("connection", (socket) => {
     // console.log(socket.handshake.auth);
     //เวลาที่มี connect มาจะไปเพิ ่มเข้า store
-    newConnectionHandler(socket, io);
+    newConnectionHandler.newConnectionHandler(socket, io);
     emitOnlineUsers();
 
     socket.on("direct-message", (data) => {
@@ -45,7 +46,6 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("direct-chat-history", (data) => {
-      console.log("direct-chat-history");
       directChatHistoryHandler(socket, data);
     });
 
@@ -70,9 +70,6 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("chatter", (data) => {
-      console.log("chatter", data);
-
-      console.log("chatter", data.name);
       if (data.message.people) {
         console.log("test");
         io.to(socket.id).emit("chatter", data.message);
@@ -111,7 +108,6 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("send-gift-to-other", (data) => {
-      console.log(data);
       io.to(socket.id).emit("other-send-gift", data);
       for (let index = 0; index < data.otherPeople.length; index++) {
         io.to(data.otherPeople[index].connUserSocketId).emit(
@@ -133,7 +129,6 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("send-card-talk", (data) => {
-      console.log(data);
       io.to(socket.id).emit("other-send-card-talk", data);
       for (let index = 0; index < data.otherPeople.length; index++) {
         io.to(data.otherPeople[index].connUserSocketId).emit(
@@ -146,6 +141,11 @@ const registerSocketServer = (server) => {
     socket.on("notify-join", (data) => {
       io.to(socket.id).emit("notify-join", serverStore.checkRoom(data));
     });
+
+    socket.on("check-user-in-room", (data) => {
+      newConnectionHandler.checkUserInRoom(socket, io, data);
+    });
+
     socket.on("disconnect", () => {
       disconnectHandler(socket);
     });
