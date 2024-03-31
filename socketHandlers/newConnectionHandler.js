@@ -8,7 +8,6 @@ const newConnectionHandler = async (socket, io) => {
   const userDetails = socket.user;
   const userId = socket.handshake.auth?.userId;
 
-  // Check if the user is already connected
   const alreadyConnected = onlineUsers.some((user) => user.userId === userId);
 
   if (!alreadyConnected) {
