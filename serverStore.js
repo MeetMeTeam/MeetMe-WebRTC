@@ -25,6 +25,10 @@ const removeUserFromRoom = (data) => {
         check = false;
       }
       if (participant.userId === data.userId) {
+        getSocketServerInstance().emit("remove-from-room", {
+          userId: data.userId,
+          socketId: data.socketId,
+        });
       }
       if (participant.userId !== data.userId) {
         Participants.push(participant);

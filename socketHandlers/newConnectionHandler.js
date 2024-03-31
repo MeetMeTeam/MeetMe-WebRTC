@@ -39,6 +39,7 @@ const checkUserInRoom = async (socket, io, data) => {
           serverStore.removeUserFromRoom({
             roomId: room.roomId,
             userId: userId,
+            socketId: socket.id,
           });
         }
       });
