@@ -1,5 +1,4 @@
 const { v4: uuidv4 } = require("uuid");
-const roomsUpdate = require("./socketHandlers/updates/rooms");
 
 const connectedUsers = new Map();
 let activeRooms = [];
@@ -48,13 +47,14 @@ const getOnlineUsers = () => {
   return onlineUsers;
 };
 
+setInterval(() => {
+  removeInvalidParticipants();
+}, [3000]);
+
 function removeInvalidParticipants() {
   activeRooms.forEach((room) => {
     const validParticipants = [];
     room.participants.forEach((participant) => {
-      console.log("------------------");
-      console.log(participant);
-      console.log("------------------");
       const connectedUsersId = [];
       connectedUsers.forEach((value, key) => {
         connectedUsersId.push(value.userId);
@@ -74,6 +74,7 @@ function removeInvalidParticipants() {
         validParticipants.push(participant);
       }
     });
+
     room.participants = validParticipants;
   });
 }
@@ -240,12 +241,6 @@ const leaveActiveRoom = (roomId, participantSocketId) => {
     }
   }
 };
-
-setInterval(() => {
-  if (activeRooms.length > 0) {
-    removeInvalidParticipants();
-  }
-}, [3000]);
 
 module.exports = {
   checkRoom,
