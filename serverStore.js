@@ -14,6 +14,33 @@ const getSocketServerInstance = () => {
   return io;
 };
 
+const removeUserFromRoom = (data) => {
+  console.log(data);
+  const newActiveRoom = activeRooms;
+  newActiveRoom.forEach((room) => {
+    const Participants = [];
+    room.participants.forEach((participant) => {
+      let check = false;
+      if (participant.userId === "default") {
+        check = false;
+      }
+      if (participant.userId === data.userId) {
+        getSocketServerInstance().emit("remove-from-room", {
+          userId: data.userId,
+          socketId: data.socketId,
+        });
+      }
+      if (participant.userId !== data.userId) {
+        Participants.push(participant);
+      }
+    });
+
+    room.participants = Participants;
+  });
+
+  console.log(newActiveRoom);
+};
+
 const addNewConnectedUser = ({ socketId, userId }) => {
   connectedUsers.set(socketId, { userId });
 };
@@ -43,8 +70,40 @@ const getOnlineUsers = () => {
     onlineUsers.push({ socketId: key, userId: value.userId });
   });
 
+  connectedUsers.forEach((value, key) => {});
   return onlineUsers;
 };
+
+setInterval(() => {
+  removeInvalidParticipants();
+}, [3000]);
+
+function removeInvalidParticipants() {
+  activeRooms.forEach((room) => {
+    const validParticipants = [];
+    room.participants.forEach((participant) => {
+      const connectedUsersId = [];
+      connectedUsers.forEach((value, key) => {
+        connectedUsersId.push(value.userId);
+      });
+
+      let check = false;
+      if (participant.userId === "default") {
+        check = true;
+      } else {
+        check = connectedUsersId.some(
+          (userId) => userId === participant.userId
+        );
+      }
+
+      if (check) {
+        validParticipants.push(participant);
+      }
+    });
+
+    room.participants = validParticipants;
+  });
+}
 
 //room
 const addNewActiveRoom = (userId, socketId, data) => {
@@ -86,7 +145,7 @@ const data = {
     },
   },
 };
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ห้องนั่งเล่น🛋️",
   type: "VOICE",
   detail: {
@@ -110,7 +169,7 @@ addNewActiveRoom("", "", {
   },
   password: "123456",
 });
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ชั้นด่านฟ้าท้าทดลอง๋࣭ ⭑☁.๋࣭ ⭑",
   type: "VOICE",
   detail: {
@@ -129,7 +188,7 @@ addNewActiveRoom("", "", {
   },
   password: "123456",
 });
-addNewActiveRoom("", "", {
+addNewActiveRoom("default", "default", {
   name: "ห้องทานข้าว🥘",
   type: "VOICE",
   detail: {
@@ -176,19 +235,29 @@ const checkRoom = (roomId) => {
 
 const joinActiveRoom = (roomId, newParticipant) => {
   const room = activeRooms.find((room) => room.roomId === roomId);
-  console.log("room has been found");
   activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
-
-  if (room) {
-    const updatedRoom = {
-      ...room,
-      participants: [...room.participants, newParticipant],
-    };
-
-    activeRooms.push(updatedRoom);
+  let check = true;
+  for (let index = 0; index < room.participants.length; index++) {
+    if (room.participants[index].userId === newParticipant.userId) {
+      check = false;
+    }
   }
 
-  console.log(activeRooms);
+  if (room) {
+    if (check) {
+      const updatedRoom = {
+        ...room,
+        participants: [...room.participants, newParticipant],
+      };
+      activeRooms.push(updatedRoom);
+    } else {
+      const updatedRoom = {
+        ...room,
+        participants: room.participants,
+      };
+      activeRooms.push(updatedRoom);
+    }
+  }
 };
 
 const leaveActiveRoom = (roomId, participantSocketId) => {
@@ -222,4 +291,5 @@ module.exports = {
   getActiveRoom,
   joinActiveRoom,
   leaveActiveRoom,
+  removeUserFromRoom,
 };
