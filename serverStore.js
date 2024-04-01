@@ -249,14 +249,14 @@ const joinActiveRoom = (roomId, newParticipant) => {
         ...room,
         participants: [...room.participants, newParticipant],
       };
+      activeRooms.push(updatedRoom);
     } else {
       const updatedRoom = {
         ...room,
         participants: room.participants,
       };
+      activeRooms.push(updatedRoom);
     }
-
-    activeRooms.push(updatedRoom);
   }
 };
 
