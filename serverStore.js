@@ -242,14 +242,21 @@ const joinActiveRoom = (roomId, newParticipant) => {
       check = false;
     }
   }
-  if (check) {
-    if (room) {
+
+  if (room) {
+    if (check) {
       const updatedRoom = {
         ...room,
         participants: [...room.participants, newParticipant],
       };
-      activeRooms.push(updatedRoom);
+    } else {
+      const updatedRoom = {
+        ...room,
+        participants: room.participants,
+      };
     }
+
+    activeRooms.push(updatedRoom);
   }
 };
 
