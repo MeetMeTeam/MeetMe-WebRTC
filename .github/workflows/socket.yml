@@ -51,6 +51,8 @@ jobs:
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            docker system prune -a -f
+            docker volume prune -a -f
             cd MeetMe-Websocket/
             docker pull ${{ secrets.DOCKER_USERNAME }}/meetme-socket:latest
             docker rm -f socket-docker
