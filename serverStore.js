@@ -74,10 +74,6 @@ const getOnlineUsers = () => {
   return onlineUsers;
 };
 
-setInterval(() => {
-  removeInvalidParticipants();
-}, [3000]);
-
 function removeInvalidParticipants() {
   activeRooms.forEach((room) => {
     const validParticipants = [];
