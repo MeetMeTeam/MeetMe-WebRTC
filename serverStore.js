@@ -236,14 +236,20 @@ const checkRoom = (roomId) => {
 const joinActiveRoom = (roomId, newParticipant) => {
   const room = activeRooms.find((room) => room.roomId === roomId);
   activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
-
-  if (room) {
-    const updatedRoom = {
-      ...room,
-      participants: [...room.participants, newParticipant],
-    };
-
-    activeRooms.push(updatedRoom);
+  let check = true;
+  for (let index = 0; index < room.participant.length; index++) {
+    if (room.participant[index].userId === newParticipant.userId) {
+      check = false;
+    }
+  }
+  if (check) {
+    if (room) {
+      const updatedRoom = {
+        ...room,
+        participants: [...room.participants, newParticipant],
+      };
+      activeRooms.push(updatedRoom);
+    }
   }
 };
 
