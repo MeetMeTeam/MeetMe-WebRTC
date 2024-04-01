@@ -237,13 +237,11 @@ const joinActiveRoom = (roomId, newParticipant) => {
   const room = activeRooms.find((room) => room.roomId === roomId);
   activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
   let check = true;
-  console.log(room.participants);
   for (let index = 0; index < room.participants.length; index++) {
     if (room.participants[index].userId === newParticipant.userId) {
       check = false;
     }
   }
-  console.log(check);
   if (check) {
     if (room) {
       const updatedRoom = {
