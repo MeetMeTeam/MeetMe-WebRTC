@@ -1,5 +1,6 @@
 const authSocket = require("./middleware/authSocket");
 const newConnectionHandler = require("./socketHandlers/newConnectionHandler");
+
 const disconnectHandler = require("./socketHandlers/disconnectHandler");
 const directMessageHandler = require("./socketHandlers/directMessageHandler");
 const directChatHistoryHandler = require("./socketHandlers/directChatHistoryHandler");
@@ -23,12 +24,13 @@ const registerSocketServer = (server) => {
   serverStore.setSocketServerInstance(io);
 
   //เมื่อคอนเน็ก จะไปวาลิเดท โทเค้นก่อน
-  io.use((socket, next) => {
-    authSocket(socket, next);
-  });
+  // io.use((socket, next) => {
+  //   authSocket(socket, next);
+  // });
 
   const emitOnlineUsers = () => {
     const onlineUsers = serverStore.getOnlineUsers();
+
     io.emit("online-users", { onlineUsers });
   };
 
@@ -36,7 +38,7 @@ const registerSocketServer = (server) => {
   io.on("connection", (socket) => {
     // console.log(socket.handshake.auth);
     //เวลาที่มี connect มาจะไปเพิ ่มเข้า store
-    newConnectionHandler(socket, io);
+    newConnectionHandler.newConnectionHandler(socket, io);
     emitOnlineUsers();
 
     socket.on("direct-message", (data) => {
@@ -44,7 +46,6 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("direct-chat-history", (data) => {
-      console.log("direct-chat-history");
       directChatHistoryHandler(socket, data);
     });
 
@@ -69,10 +70,11 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("chatter", (data) => {
-      if (data.people) {
+      if (data.message.people) {
+        console.log("test");
         io.to(socket.id).emit("chatter", data.message);
-        data.people.forEach((participant) => {
-          io.to(participant.connUserSocketId).emit("chatter", data.message);
+        data.message.people.forEach((participant) => {
+          io.to(participant.socketId).emit("chatter", data.message);
         });
       } else {
         io.emit("chatter", data.message);
@@ -105,9 +107,45 @@ const registerSocketServer = (server) => {
       }
     });
 
+    socket.on("send-gift-to-other", (data) => {
+      io.to(socket.id).emit("other-send-gift", data);
+      for (let index = 0; index < data.otherPeople.length; index++) {
+        io.to(data.otherPeople[index].connUserSocketId).emit(
+          "other-send-gift",
+          data
+        );
+      }
+      const message = {
+        color: "black",
+        name: "system",
+        text: `คุณ ${data.userDetail.displayName} ได้ส่งของขวัญให้กับ ${data.selectUser.name.displayName}`,
+        textId: data.idText,
+        isGift: true,
+      };
+      io.to(socket.id).emit("chatter", message);
+      data.otherPeople.forEach((participant) => {
+        io.to(participant.connUserSocketId).emit("chatter", message);
+      });
+    });
+
+    socket.on("send-card-talk", (data) => {
+      io.to(socket.id).emit("other-send-card-talk", data);
+      for (let index = 0; index < data.otherPeople.length; index++) {
+        io.to(data.otherPeople[index].connUserSocketId).emit(
+          "other-send-card-talk",
+          data
+        );
+      }
+    });
+
     socket.on("notify-join", (data) => {
       io.to(socket.id).emit("notify-join", serverStore.checkRoom(data));
     });
+
+    socket.on("check-user-in-room", (data) => {
+      newConnectionHandler.checkUserInRoom(socket, io, data);
+    });
+
     socket.on("disconnect", () => {
       disconnectHandler(socket);
     });

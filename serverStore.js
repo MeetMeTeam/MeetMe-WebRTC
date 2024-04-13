@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const connectedUsers = new Map();
 let activeRooms = [];
+let passwordActiveRooms = [];
 
 let io = null;
 
@@ -11,6 +12,33 @@ const setSocketServerInstance = (ioInstance) => {
 
 const getSocketServerInstance = () => {
   return io;
+};
+
+const removeUserFromRoom = (data) => {
+  console.log(data);
+  const newActiveRoom = activeRooms;
+  newActiveRoom.forEach((room) => {
+    const Participants = [];
+    room.participants.forEach((participant) => {
+      let check = false;
+      if (participant.userId === "default") {
+        check = false;
+      }
+      if (participant.userId === data.userId) {
+        getSocketServerInstance().emit("remove-from-room", {
+          userId: data.userId,
+          socketId: data.socketId,
+        });
+      }
+      if (participant.userId !== data.userId) {
+        Participants.push(participant);
+      }
+    });
+
+    room.participants = Participants;
+  });
+
+  console.log(newActiveRoom);
 };
 
 const addNewConnectedUser = ({ socketId, userId }) => {
@@ -42,17 +70,47 @@ const getOnlineUsers = () => {
     onlineUsers.push({ socketId: key, userId: value.userId });
   });
 
+  connectedUsers.forEach((value, key) => {});
   return onlineUsers;
 };
 
+function removeInvalidParticipants() {
+  activeRooms.forEach((room) => {
+    const validParticipants = [];
+    room.participants.forEach((participant) => {
+      const connectedUsersId = [];
+      connectedUsers.forEach((value, key) => {
+        connectedUsersId.push(value.userId);
+      });
+
+      let check = false;
+      if (participant.userId === "default") {
+        check = true;
+      } else {
+        check = connectedUsersId.some(
+          (userId) => userId === participant.userId
+        );
+      }
+
+      if (check) {
+        validParticipants.push(participant);
+      }
+    });
+
+    room.participants = validParticipants;
+  });
+}
+
 //room
 const addNewActiveRoom = (userId, socketId, data) => {
+  const roomId = uuidv4();
   const newActiveRoom = {
     roomCreator: {
       userId,
       socketId,
       roomName: data.name,
       type: data.type,
+      detail: data.detail,
     },
     participants: [
       {
@@ -61,21 +119,90 @@ const addNewActiveRoom = (userId, socketId, data) => {
         name: data.name,
       },
     ],
-    roomId: uuidv4(),
+    roomId: roomId,
   };
-
+  const privateData = {
+    password: data.password,
+    roomId: roomId,
+  };
   activeRooms = [...activeRooms, newActiveRoom];
+  passwordActiveRooms = [...passwordActiveRooms, privateData];
 
   console.log("new active rooms: ");
 
   return newActiveRoom;
 };
-addNewActiveRoom("", "", { name: "ห้องนั่งเล่น🛋️", type: "VOICE" });
-addNewActiveRoom("", "", {
+const data = {
+  detail: {
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+};
+addNewActiveRoom("default", "default", {
+  name: "ห้องนั่งเล่น🛋️",
+  type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "🧑🏻‍💻 General",
+        color: "bg-yellow-70",
+      },
+      {
+        id: 1,
+        name: "🤪 Fun ",
+        color: "bg-yellow-40",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
+});
+addNewActiveRoom("default", "default", {
   name: "ชั้นด่านฟ้าท้าทดลอง๋࣭ ⭑☁.๋࣭ ⭑",
   type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "⚽ Hobbies",
+        color: "bg-blue-80",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
 });
-addNewActiveRoom("", "", { name: "ห้องทานข้าว🥘", type: "VOICE" });
+addNewActiveRoom("default", "default", {
+  name: "ห้องทานข้าว🥘",
+  type: "VOICE",
+  detail: {
+    cate: [
+      {
+        id: 5,
+        name: "🧑🏻‍💻 General",
+        color: "bg-yellow-70",
+      },
+    ],
+    theme: {
+      index: 2,
+      name: "bar",
+      link: "https://cdnb.artstation.com/p/assets/images/images/035/693/525/large/daryna-vladimirova-.jpg?1615642496",
+    },
+  },
+  password: "123456",
+});
 
 const getActiveRooms = () => {
   return [...activeRooms];
@@ -104,19 +231,29 @@ const checkRoom = (roomId) => {
 
 const joinActiveRoom = (roomId, newParticipant) => {
   const room = activeRooms.find((room) => room.roomId === roomId);
-  console.log("room has been found");
   activeRooms = activeRooms.filter((room) => room.roomId !== roomId);
-
-  if (room) {
-    const updatedRoom = {
-      ...room,
-      participants: [...room.participants, newParticipant],
-    };
-
-    activeRooms.push(updatedRoom);
+  let check = true;
+  for (let index = 0; index < room.participants.length; index++) {
+    if (room.participants[index].userId === newParticipant.userId) {
+      check = false;
+    }
   }
 
-  console.log(activeRooms);
+  if (room) {
+    if (check) {
+      const updatedRoom = {
+        ...room,
+        participants: [...room.participants, newParticipant],
+      };
+      activeRooms.push(updatedRoom);
+    } else {
+      const updatedRoom = {
+        ...room,
+        participants: room.participants,
+      };
+      activeRooms.push(updatedRoom);
+    }
+  }
 };
 
 const leaveActiveRoom = (roomId, participantSocketId) => {
@@ -150,4 +287,5 @@ module.exports = {
   getActiveRoom,
   joinActiveRoom,
   leaveActiveRoom,
+  removeUserFromRoom,
 };
