@@ -82,6 +82,7 @@ const registerSocketServer = (server) => {
     });
 
     socket.on("cam-change", (data) => {
+      console.log(data);
       data.peopleInRoom.forEach((participant) => {
         socket.to(participant.socketId).emit("other-cam-change", {
           userId: data.userId,
@@ -140,10 +141,6 @@ const registerSocketServer = (server) => {
 
     socket.on("notify-join", (data) => {
       io.to(socket.id).emit("notify-join", serverStore.checkRoom(data));
-    });
-
-    socket.on("check-user-in-room", (data) => {
-      newConnectionHandler.checkUserInRoom(socket, io, data);
     });
 
     socket.on("disconnect", () => {
